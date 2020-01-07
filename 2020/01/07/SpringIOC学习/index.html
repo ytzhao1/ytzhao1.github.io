@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Spring | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本文大部分例子以及文档全都摘抄自https:&#x2F;&#x2F;blog.csdn.net&#x2F;javazejian&#x2F;article&#x2F;details&#x2F;54561302，此博客是对自己的认知做一个汇总，大佬的文章中深入浅出讲了很多例子，如果是小白，那么请见大佬文档，这篇只是方便自己学习。 Spring IOC 就是控制反转，将对象的创建权，由Spring管理，DI（依赖注入）就是在Spring创建对象的过程中，把对象依">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring">
+<meta property="og:url" content="http://yoursite.com/2020/01/07/SpringIOC%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="本文大部分例子以及文档全都摘抄自https:&#x2F;&#x2F;blog.csdn.net&#x2F;javazejian&#x2F;article&#x2F;details&#x2F;54561302，此博客是对自己的认知做一个汇总，大佬的文章中深入浅出讲了很多例子，如果是小白，那么请见大佬文档，这篇只是方便自己学习。 Spring IOC 就是控制反转，将对象的创建权，由Spring管理，DI（依赖注入）就是在Spring创建对象的过程中，把对象依">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-01-07T12:02:37.000Z">
+<meta property="article:modified_time" content="2020-01-07T13:05:31.474Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-SpringIOC学习" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/01/07/SpringIOC%E5%AD%A6%E4%B9%A0/" class="article-date">
+  <time datetime="2020-01-07T12:02:37.000Z" itemprop="datePublished">2020-01-07</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Spring
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文大部分例子以及文档全都摘抄自<a href="https://blog.csdn.net/javazejian/article/details/54561302" target="_blank" rel="noopener">https://blog.csdn.net/javazejian/article/details/54561302</a>，此博客是对自己的认知做一个汇总，大佬的文章中深入浅出讲了很多例子，如果是小白，那么请见大佬文档，这篇只是方便自己学习。</p>
+<p>Spring IOC 就是控制反转，将对象的创建权，由Spring管理，DI（依赖注入）就是在Spring创建对象的过程中，把对象依赖的属性注入到类中，之前我们需要用到一个类，要么自己new出来，要么靠反射，那么这样代码之间的耦合性就特别高，如何解决这个问题呢？</p>
+<p>Spring给我们提供了很好的方式</p>
+<p>A类：s，我需要用到B对象</p>
+<p>Spring：好咧，把B的名字，（别名，类型）给我。</p>
+<p>Spring：给你给你，我早就给你生成好了，就等着你来拿呢。</p>
+<p>A类：ioc就是方便！</p>
+<p>上面简单的对话形容了什么Spring IOC 就像是，小卖铺，需要买啥和它说一声就好，他都会给你的！</p>
+<p>###一、Spring如何进货（如何装配Bean）</p>
+<p>有两种方式，一是xml配置文件中配置，二是注解形式，这里我们简单举两个例子</p>
+<h4 id="1-1、写好进货单（xml配置）"><a href="#1-1、写好进货单（xml配置）" class="headerlink" title="1.1、写好进货单（xml配置）"></a>1.1、写好进货单（xml配置）</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">        "</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 声明accountDao对象,交给spring创建 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"accountDao"</span> <span class="attr">class</span>=<span class="string">"com.zejian.spring.springIoc.dao.impl.AccountDaoImpl"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="1-2在货品上标记（注解）"><a href="#1-2在货品上标记（注解）" class="headerlink" title="1.2在货品上标记（注解）"></a>1.2在货品上标记（注解）</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.zejian.spring.springIoc.conf;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.zejian.spring.springIoc.dao.AccountDao;</span><br><span class="line"><span class="keyword">import</span> com.zejian.spring.springIoc.dao.impl.AccountDaoImpl;</span><br><span class="line"><span class="keyword">import</span> com.zejian.spring.springIoc.service.AccountService;</span><br><span class="line"><span class="keyword">import</span> com.zejian.spring.springIoc.service.impl.AccountServiceImpl;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Bean;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by zejian on 2017/1/15.</span></span><br><span class="line"><span class="comment"> * Blog : http://blog.csdn.net/javazejian [原文地址,请尊重原创]</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> AccountDao <span class="title">accountDao</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> AccountDaoImpl();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> AccountService <span class="title">accountService</span><span class="params">()</span></span>&#123;</span><br><span class="line">        AccountServiceImpl bean=<span class="keyword">new</span> AccountServiceImpl();</span><br><span class="line">        <span class="comment">//注入dao</span></span><br><span class="line">        bean.setAccountDao(accountDao());</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码中使用了@Configuration注解标明BeanConfiguration类，使得BeanConfiguration类替代了xml文件，也就是说注解@Configuration等价于＜beans＞标签。在该类中，每个使用注解@Bean的公共方法对应着一个＜bean＞标签的定义，即@Bean等价于＜bean＞标签。这种基于java的注解配置方式是在spring3.0中引入的。</p>
+<h3 id="二、你如何把商品待回去（如何将类注入到其他类）"><a href="#二、你如何把商品待回去（如何将类注入到其他类）" class="headerlink" title="二、你如何把商品待回去（如何将类注入到其他类）"></a>二、你如何把商品待回去（如何将类注入到其他类）</h3><h4 id="2-1、Setter注入"><a href="#2-1、Setter注入" class="headerlink" title="2.1、Setter注入"></a>2.1、Setter注入</h4><p>Setter注入顾名思义，被注入的属性需要有set方法， Setter注入支持简单类型和引用类型，Setter注入时在bean实例创建完成后执行的。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 声明accountDao对象并交给spring创建 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"accountDao"</span> <span class="attr">class</span>=<span class="string">"com.zejian.spring.springIoc.dao.impl.AccountDaoImpl"</span>/&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 声明accountService对象,交给spring创建 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"accountService"</span> <span class="attr">class</span>=<span class="string">"com.zejian.spring.springIoc.service.impl.AccountServiceImpl"</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- 通过setter注入accountDao对象,对象注入使用ref--&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"accountDao"</span> <span class="attr">ref</span>=<span class="string">"accountDao"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2、构造函数注入"><a href="#2-2、构造函数注入" class="headerlink" title="2.2、构造函数注入"></a>2.2、构造函数注入</h4><p>构造注入也就是通过构造方法注入依赖，构造函数的参数一般情况下就是依赖项，spring容器会根据bean中指定的构造函数参数来决定调用那个构造函数，同样看一个案例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by zejian on 2017/1/15.</span></span><br><span class="line"><span class="comment"> * Blog : http://blog.csdn.net/javazejian [原文地址,请尊重原创]</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AccountServiceImpl</span> <span class="keyword">implements</span> <span class="title">AccountService</span></span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 需要注入的对象Dao层对象</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> AccountDao accountDao;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 构造注入</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> accountDao</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AccountServiceImpl</span><span class="params">(AccountDao accountDao)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.accountDao=accountDao;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//........</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"accountDao"</span> <span class="attr">class</span>=<span class="string">"com.zejian.spring.springIoc.dao.impl.AccountDaoImpl"</span>/&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 通过构造注入依赖 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"accountService"</span> <span class="attr">class</span>=<span class="string">"com.zejian.spring.springIoc.service.impl.AccountServiceImpl"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 构造方法方式注入accountDao对象,--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">constructor-arg</span>  <span class="attr">ref</span>=<span class="string">"accountDao"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>####2.3、商品上标记好（基于自动装配与注解注入）</p>
+<h5 id="2-3-1基于xml的自动装配"><a href="#2-3-1基于xml的自动装配" class="headerlink" title="2.3.1基于xml的自动装配"></a>2.3.1基于xml的自动装配</h5><p>spring自动装配有三种模式：byType(根据类型)，byName(根据名称),constructor(根据构造函数)</p>
+<h5 id="2-3-2基于注解"><a href="#2-3-2基于注解" class="headerlink" title="2.3.2基于注解"></a>2.3.2基于注解</h5><p>注解主要有3中</p>
+<ul>
+<li><p>@Autowired</p>
+<p>一般选择成员变量注入（省略set方法和构造方法），@Qualifier注解可以按名称（byName）匹配</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceImpl</span> <span class="keyword">implements</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line">    <span class="comment">//标注成员变量</span></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier</span>(<span class="string">"userDao1"</span>)</span><br><span class="line">    <span class="keyword">private</span> UserDao userDao;   </span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>​</p>
+</li>
+<li><p>@Resource</p>
+<p>和@Autowired有同样的功效，@Resource有两个中重要的属性：name和type。Spring容器对于@Resource注解的name属性解析为bean的名字，type属性则解析为bean的类型。因此使用name属性，则按byName模式的自动注入策略，如果使用type属性则按 byType模式自动注入策略。倘若既不指定name也不指定type属性，Spring容器将通过反射技术默认按byName模式注入。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//@Autowired标注成员变量</span></span><br><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="meta">@Qualifier</span>(<span class="string">"userDao"</span>)</span><br><span class="line"><span class="keyword">private</span> UserDao userDao;  </span><br><span class="line"><span class="comment">//上述代码等价于@Resource</span></span><br><span class="line"><span class="meta">@Resource</span>(name=“userDao”)</span><br><span class="line"><span class="keyword">private</span> UserDao  userDao;<span class="comment">//用于成员变量</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//也可以用于set方法标注</span></span><br><span class="line"><span class="meta">@Resource</span>(name=“userDao”)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUserDao</span><span class="params">(UserDao userDao)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">this</span>.userDao= userDao;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>@Value</p>
+<p>上面两个注解的依赖注入并不适合简单值类型，如int，boolean，long，String以及Enum等，@Value接收一个String的值，该值指定了将要被注入到内置的java类型属性值，放心，不必关系类型转换，大多数情况下Spring容器都会自动处理好的。一般情况下@Value会与properties文件结合使用，也分两种情况一种是SpEL（有点类似于jsp的EL），另外一种是占位符方式，看一个简单例子jdbc.properties文件如下：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">jdbc.driver</span>=<span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line"><span class="meta">jdbc.url</span>=<span class="string">jdbc:mysql://127.0.0.1:3306/test?characterEncoding=UTF-8&amp;allowMultiQueries=true</span></span><br><span class="line"><span class="meta">jdbc.username</span>=<span class="string">root</span></span><br><span class="line"><span class="meta">jdbc.password</span>=<span class="string">root</span></span><br></pre></td></tr></table></figure>
+
+<p>利用注解@Value获取jdbc.url和jdbc.username的值，实现如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by zejian on 2017/1/18.</span></span><br><span class="line"><span class="comment"> * Blog : http://blog.csdn.net/javazejian [原文地址,请尊重原创]</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServiceImpl</span> <span class="keyword">implements</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line">    <span class="comment">//标注成员变量</span></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier</span>(<span class="string">"userDao"</span>)</span><br><span class="line">    <span class="keyword">private</span> UserDao userDao;</span><br><span class="line">    <span class="comment">//占位符方式</span></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;jdbc.url&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String url;</span><br><span class="line">    <span class="comment">//SpEL表达方式，其中代表xml配置文件中的id值configProperties</span></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"#&#123;configProperties['jdbc.username']&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String userName;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">done</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"url:"</span>+url);</span><br><span class="line">        System.out.println(<span class="string">"username:"</span>+userName);</span><br><span class="line">        userDao.done();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<h3 id="三、店家如何管理商品（别名与重写）"><a href="#三、店家如何管理商品（别名与重写）" class="headerlink" title="三、店家如何管理商品（别名与重写）"></a>三、店家如何管理商品（别名与重写）</h3><h4 id="3-1、别名"><a href="#3-1、别名" class="headerlink" title="3.1、别名"></a>3.1、别名</h4><p>一般我们在依赖其他类的时候，名字是驼峰的，第一个字母小写</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"accountDaoId"</span> <span class="attr">class</span>=<span class="string">"com.zejian.spring.springIoc.dao.impl.AccountDaoImpl"</span>/&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- name属性指明要给那个Bean赋予别名,alias则指明赋予的别名--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">alias</span> <span class="attr">name</span>=<span class="string">"accountDaoId"</span> <span class="attr">alias</span>=<span class="string">"accountDao3"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这样我们既可以用accountDaoId也可以用accountDao3，这两个都是同一个类</p>
+<h4 id="3-2、重写"><a href="#3-2、重写" class="headerlink" title="3.2、重写"></a>3.2、重写</h4><p>Bean的重写机制没有那么神秘，主要就是当不同的xml文件中出现同名id属性的bean时，读取的优先级问题，后依赖的配置文件中的类，会覆盖前面配置文件中的类</p>
+<h3 id="四、商品的使用范围（bean的作用域）"><a href="#四、商品的使用范围（bean的作用域）" class="headerlink" title="四、商品的使用范围（bean的作用域）"></a>四、商品的使用范围（bean的作用域）</h3><h4 id="4-1、房子（Singleton作用域）"><a href="#4-1、房子（Singleton作用域）" class="headerlink" title="4.1、房子（Singleton作用域）"></a>4.1、房子（Singleton作用域）</h4><p>（拥有n套房子的大佬请忽略这个不恰当的例子）人这一辈子只有一套房子，当你出生时就拥有了一套房子，直到去世咱们只有这一套，房子的使用范围是在你整个生命中，只有一套的。无论你走多远，回到家里，仍是同一套房子。spring这样配置的</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 默认情况下无需声明Singleton --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"accountDao"</span> <span class="attr">scope</span>=<span class="string">"singleton"</span>    </span></span><br><span class="line"><span class="tag"><span class="attr">class</span>=<span class="string">"com.zejian.spring.springIoc.dao.impl.AccountDaoImpl"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="4-2、纸巾（prototype作用域）"><a href="#4-2、纸巾（prototype作用域）" class="headerlink" title="4.2、纸巾（prototype作用域）"></a>4.2、纸巾（prototype作用域）</h4><p>今年杭州冬天不冷啊，但我还是感冒了，每次打喷嚏都要抽一张纸巾，我擤鼻涕一次就需要一张纸巾，它代表每次获取Bean实例时都会创建一个实例对象，类似new操作符</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 作用域：prototype --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"accountDao"</span> <span class="attr">scope</span>=<span class="string">"prototype"</span>     <span class="attr">class</span>=<span class="string">"com.zejian.spring.springIoc.dao.impl.AccountDaoImpl"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>注解方式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Scope</span>(<span class="string">"prototype"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AccountDaoImpl</span> </span>&#123;</span><br><span class="line">    <span class="comment">//......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这时候就有问题了，如果我在一个singleton中引用了一个prototype咋整？这时候singleton中的prototype只会是同一个啊，房子是同一个，里面的顶梁柱还能换不成？</p>
+<h4 id="4-3、筷子（request作用域）"><a href="#4-3、筷子（request作用域）" class="headerlink" title="4.3、筷子（request作用域）"></a>4.3、筷子（request作用域）</h4><p>每天工作太忙，完全没时间自己做饭吃，也好，圆了小时候的梦，每天下馆子，那我每吃一顿饭就用一双筷子，吃完筷子也就丢了，下次吃饭也不会用了！那么当前的bean实例也仅是在当前的HTTP request内有效，整个请求过程也只会使用相同的bean实例，当处理请求结束，request作用域的bean实例将被销毁。</p>
+<h4 id="4-4、床（session作用域）"><a href="#4-4、床（session作用域）" class="headerlink" title="4.4、床（session作用域）"></a>4.4、床（session作用域）</h4><p>从小宝宝长到大，总会换几张床的吧，关于Session可能你也已猜到，每当创建一个新的HTTP Session时就会创建一个Session作用域的Bean，并该实例bean伴随着会话的存在而存在。下面看一个测试程序：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Scope</span>(value = <span class="string">"singleton"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SingletonBean</span> </span>&#123;</span><br><span class="line">    <span class="comment">//......</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Scope</span>(value = <span class="string">"prototype"</span> , proxyMode = ScopedProxyMode.TARGET_CLASS)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrototypeBean</span> </span>&#123;</span><br><span class="line">    <span class="comment">//......</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Scope</span>(value = <span class="string">"request"</span> , proxyMode = ScopedProxyMode.TARGET_CLASS)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RequestBean</span> </span>&#123;</span><br><span class="line">    <span class="comment">//......</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Scope</span>(value = <span class="string">"session"</span> , proxyMode = ScopedProxyMode.TARGET_CLASS)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SessionBean</span> </span>&#123;</span><br><span class="line">    <span class="comment">//........</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码，分别创建4个不同作用域的Bean，并使用注解的方式开发，@Component表名它们是组件类，需要Spring容器帮忙创建，@Scope注明作用域，value指明是哪种作用域，除了SingletonBean外，其它Bean还使用proxyMode指明哪种代理模式创建，这里没有接口，因此使用CGLib代理生成（后面会分析为什么这么做）。接着需要在xml注明扫描包告诉Spring容器它们在哪里（4个类都声明在com.zejian.spring.dto包下）。</p>
+<p>但我们还是很诧异，为什么需要在其他3种作用域上设置代理模式？事实上这个问题的本质与前面Singleton作用域的bean依赖于Prototype作用域的bean原理是相同，Prototype前面已分析过了（使用注解时也必须声明代理模式），这里我们主要分析request和session作用域，由于Spring容器只会在创建bean实例时帮助我们注入该实例bean所依赖的其他bean实例，而且只会注入一次，这并不是request、session作用域所希望看到的，毕竟它们都需要在不同的场景下注入新的实例对象而不是唯一不变的实例对象。为了解决这种困境，必须放弃直接在xml中注入bean实例，改用java代码方式(实现ApplicationContextAware接口)或者注解的方式(@Autowired)注入。示例中选择了后者，并在bean的声明中声明了动态代理模式（关于动态代理自行查阅相关资料），幸运地是，Spring容器足够聪明，以至于spring容器通过代理的方式生成新的代理实例bean，以此来满足创建新实例的需求。在程序运行过程中，当一个方法调用到达该代理对象时，Spring容器便尝试在当前的请求(Request)或者会话(Session)获取目标对象Bean(真正的实例Bean)。如果已存在则使用该Bean，否则，代理方法将创建新实例bean处理请求或者会话，请注意，这里指的的是一次Http请求或者一次会话的过程。如果希望request和session作用域通过xml配置文件方式声明时必须在＜bean＞标签中放置＜aop:scoped-proxy＞作为子标签，该作用于注解声明代理模式效果相同(需要引用aop命名空间，关于aop不清楚的，这里可简单理解为声明代理即可)。请注意，经过测试这种声明代理的方式不适合prototype作用域，该作用域生效的方式目前测试中只有基于注解方式和前面基于实现ApplicationContextAware接口两种方式。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag"> <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="attr">xmlns:mvc</span>=<span class="string">"http://www.springframework.org/schema/mvc"</span></span></span><br><span class="line"><span class="tag"> <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></span></span><br><span class="line"><span class="tag"> <span class="attr">xmlns:aop</span>=<span class="string">"http://www.springframework.org/schema/aop"</span></span></span><br><span class="line"><span class="tag"> <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans</span></span></span><br><span class="line"><span class="tag"><span class="string">http://www.springframework.org/schema/beans/spring-beans-3.2.xsd http://www.springframework.org/schema/mvc</span></span></span><br><span class="line"><span class="tag"><span class="string">http://www.springframework.org/schema/mvc/spring-mvc.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">http://www.springframework.org/schema/context</span></span></span><br><span class="line"><span class="tag"><span class="string">http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd"</span></span></span><br><span class="line"><span class="tag">&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"requestBean"</span> <span class="attr">scope</span>=<span class="string">"request"</span> <span class="attr">class</span>=<span class="string">"com.zejian.spring.dto.RequestBean"</span> &gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 声明aop代理 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">aop:scoped-proxy</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"sessionBean"</span> <span class="attr">scope</span>=<span class="string">"request"</span> <span class="attr">class</span>=<span class="string">"com.zejian.spring.dto.SessionBean"</span> &gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 声明aop代理 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">aop:scoped-proxy</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="五、吃烧烤（Bean的延迟加载）"><a href="#五、吃烧烤（Bean的延迟加载）" class="headerlink" title="五、吃烧烤（Bean的延迟加载）"></a>五、吃烧烤（Bean的延迟加载）</h3><p>这家小卖部里竟然还卖烧烤？烧烤放凉了可就不好吃了，必须现烤现吃，最香了，夏天的傍晚…</p>
+<p>在某些情况下，我们可能希望把bean的创建延迟到使用阶段，以免消耗不必要的内存，Spring也非常自愿地支持了延迟bean的初始化。因此可以在配置文件中定义bean的延迟加载，这样Spring容器将会延迟bean的创建直到真正需要时才创建。通常情况下，从一个已创建的bean引用另外一个bean，或者显示查找一个bean时会触发bean的创建即使配置了延迟属性，因此如果Spring容器在启动时创建了那些设为延长加载的bean实例，不必惊讶，可能那些延迟初始化的bean可能被注入到一个非延迟创建且作用域为singleton的bean。在xml文件中使用bean的lazy-init属性可以配置改bean是否延迟加载，如果需要配置整个xml文件的bean都延迟加载则使用defualt-lazy-init属性，请注意lazy-init属性会覆盖defualt-lazy-init属性。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">        http://www.springframework.org/schema/context</span></span></span><br><span class="line"><span class="tag"><span class="string">        http://www.springframework.org/schema/context/spring-context.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">        "</span> <span class="attr">default-lazy-init</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--default-lazy-init="true" xml中全部bean延迟加载 --&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- lazy-init="false" 表示非延长加载--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"accountDao"</span> <span class="attr">lazy-init</span>=<span class="string">"false"</span></span></span><br><span class="line"><span class="tag">          <span class="attr">class</span>=<span class="string">"com.zejian.spring.springIoc.dao.impl.AccountDaoImpl"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 声明accountService对象,交给spring创建 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"accountService"</span> <span class="attr">class</span>=<span class="string">"com.zejian.spring.springIoc.service.impl.AccountServiceImpl"</span>&gt;</span></span><br><span class="line">          <span class="comment">&lt;!-- 注入accountDao对象,需要set方法--&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"accountDao"</span> <span class="attr">ref</span>=<span class="string">"accountDao"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>请务必明确一点，默认情况下Spring容器在启动阶段就会创建bean，这个过程被称为预先bean初始化，这样是有好处的，可尽可能早发现配置错误，如配置文件的出现错别字或者某些bean还没有被定义却被注入等。当然如存在大量bean需要初始化，这可能引起spring容器启动缓慢，一些特定的bean可能只是某些场合需要而没必要在spring容器启动阶段就创建，这样的bean可能是Mybatis的SessionFactory或者Hibernate SessionFactory等，延迟加载它们会让Spring容器启动更轻松些，从而也减少没必要的内存消耗。</p>
+<p>以上给大家讲了个故事，方便理解。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/01/07/SpringIOC%E5%AD%A6%E4%B9%A0/" data-id="ck53w04tj0000x3ad5r4w3rvr" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/01/02/AspectJ%E5%92%8CSpring%E7%9A%84AOP/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">AspectJ和Spring的AOP</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/01/07/SpringIOC%E5%AD%A6%E4%B9%A0/">Spring</a>
+          </li>
+        
+          <li>
+            <a href="/2020/01/02/AspectJ%E5%92%8CSpring%E7%9A%84AOP/">AspectJ和Spring的AOP</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/30/logback%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/">logback使用详解</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/30/%E5%BC%80%E5%8F%91%E6%8A%80%E5%B7%A7/">开发技巧</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/29/Hello/">Hello</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
