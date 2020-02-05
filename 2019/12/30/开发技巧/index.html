@@ -15,7 +15,7 @@
 <meta property="og:description" content="最近经常逛github，看到里面一些好的项目和经验，最近看到了一个leader写的内容，对我很有启发，这半年看了不少源码，但是在实际开发中却很好使用起来，总结来说，总是想把人家的开发方式往我自己的业务开发上面套，只学到了皮毛，却没有理解别人为啥要这么做，导致实际场景中不能使用（因为自己的场景实在简单，只是些CURD），但是这篇作者的文章却给了我启发。原作者文章链接如下：（https:&#x2F;&#x2F;xwjie">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2019-12-30T12:08:13.172Z">
-<meta property="article:modified_time" content="2019-12-31T12:37:00.410Z">
+<meta property="article:modified_time" content="2020-02-05T08:32:33.911Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
   
@@ -187,6 +187,38 @@
 </blockquote>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">handle</span><span class="params">(String fileName)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//括号里面的流会被自动关闭</span></span><br><span class="line">    <span class="keyword">try</span> (BufferedReader reader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> FileReader(fileName))) &#123;</span><br><span class="line">        String line;</span><br><span class="line">        <span class="keyword">while</span> ((line = reader.readLine()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<h4 id="6-减少Null-XXX-的写法"><a href="#6-减少Null-XXX-的写法" class="headerlink" title="6.减少Null != XXX 的写法"></a>6.减少Null != XXX 的写法</h4><p>尽所周知，好多变量都有可能为null，所有就写了满屏的null != xxx 的判断，这种判断多了，就很碍眼了，怎么能够减少这种写法，还能不影响业务逻辑</p>
+<p>返回值为null有两种含义</p>
+<ul>
+<li>null代表着一种实际意义，这个值就存在有null的情况</li>
+<li>null值为错误值，后续操作不允许此值为null</li>
+</ul>
+<p>如上两种情况，第一种情况，后续代码就是要兼容为null的情况，第二种情况就要想办法避免返回null值，或者是否需要抛出一个异常。</p>
+<p>如</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyParser</span> <span class="keyword">implements</span> <span class="title">Parser</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> Action DO_NOTHING = <span class="keyword">new</span> Action() &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123; <span class="comment">/* do nothing */</span> &#125;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Action <span class="title">findAction</span><span class="params">(String userInput)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">if</span> ( <span class="comment">/* we can't find any actions */</span> ) &#123; <span class="comment">//再找不到匹配的action的时候，我们返回默认的action，防止获取action的后续代码出现null的情况</span></span><br><span class="line">      <span class="keyword">return</span> DO_NOTHING;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="7-正确使用equals方法"><a href="#7-正确使用equals方法" class="headerlink" title="7.正确使用equals方法"></a>7.正确使用equals方法</h4><p>Objects的equals的方法经常报空指针异常，所以我们都知道需要使用常量或者确定的对象来调用equals方法。举个例子</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不能使用一个值为null的引用类型变量来调用非静态方法，否则会抛出异常</span></span><br><span class="line">String str = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">if</span> (str.equals(<span class="string">"SnailClimb"</span>)) &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  ..</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行上面的程序会抛出空指针异常，但是我们把第二行的条件判断语句改为下面这样的话，就不会抛出空指针异常，else 语句块得到执行。：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"SnailClimb"</span>.equals(str);<span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+
+<p>不过更推荐使用 <code>java.util.Objects#equals</code>(JDK7 引入的工具类)。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Objects.equals(<span class="keyword">null</span>,<span class="string">"SnailClimb"</span>);<span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+
+<p>我们看一下<code>java.util.Objects#equals</code>的源码就知道原因了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object a, Object b)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 可以避免空指针异常。如果a==null的话此时a.equals(b)就不会得到执行，避免出现空指针异常。</span></span><br><span class="line">        <span class="keyword">return</span> (a == b) || (a != <span class="keyword">null</span> &amp;&amp; a.equals(b));</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li><p>每种原始类型都有默认值一样，如int默认值为 0，boolean 的默认值为 false，null 是任何引用类型的默认值，不严格的说是所有 Object 类型的默认值。</p>
+</li>
+<li><p>可以使用 == 或者 != 操作来比较null值，但是不能使用其他算法或者逻辑操作。在Java中<code>null == null</code>将返回true。</p>
+</li>
+<li><p>不能使用一个值为null的引用类型变量来调用非静态方法，否则会抛出异常</p>
+<p>​</p>
+</li>
+</ul>
 
       
     </div>
@@ -249,6 +281,10 @@
       <ul>
         
           <li>
+            <a href="/2020/01/30/java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9B%B8%E5%85%B3/">java虚拟机相关</a>
+          </li>
+        
+          <li>
             <a href="/2020/01/17/%E4%BC%98%E7%A7%80%E7%BD%91%E5%9D%80%E6%B1%87%E6%80%BB/">优秀网址汇总</a>
           </li>
         
@@ -262,10 +298,6 @@
         
           <li>
             <a href="/2020/01/02/AspectJ%E5%92%8CSpring%E7%9A%84AOP/">AspectJ和Spring的AOP</a>
-          </li>
-        
-          <li>
-            <a href="/2019/12/30/logback%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3/">logback使用详解</a>
           </li>
         
       </ul>
