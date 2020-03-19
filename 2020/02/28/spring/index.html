@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>spring | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本文将全局介绍Spring的技术内幕。《Spring技术内幕》 #一、spring架构 二、Spring核心：ioc容器的实现ioc容器是以BeanFactory作为最基本的接口类，里面定义了ioc的基本轮廓，BeanFactory设计了getBean方法，这个方法时IOC容器API的主要方法。 2.1 XmlBeanFactory的工作原理在这个基础上Spring提供了一系列基于BeanFact">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring">
+<meta property="og:url" content="http://yoursite.com/2020/02/28/spring/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="本文将全局介绍Spring的技术内幕。《Spring技术内幕》 #一、spring架构 二、Spring核心：ioc容器的实现ioc容器是以BeanFactory作为最基本的接口类，里面定义了ioc的基本轮廓，BeanFactory设计了getBean方法，这个方法时IOC容器API的主要方法。 2.1 XmlBeanFactory的工作原理在这个基础上Spring提供了一系列基于BeanFact">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200302104359763.png">
+<meta property="og:image" content="http://yoursite.com/.com//g">
+<meta property="article:published_time" content="2020-02-28T09:14:13.000Z">
+<meta property="article:modified_time" content="2020-03-03T06:32:09.698Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/.com//image-20200302104359763.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-spring" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/02/28/spring/" class="article-date">
+  <time datetime="2020-02-28T09:14:13.000Z" itemprop="datePublished">2020-02-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      spring
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文将全局介绍Spring的技术内幕。《Spring技术内幕》</p>
+<p>#一、spring架构</p>
+<h1 id="二、Spring核心：ioc容器的实现"><a href="#二、Spring核心：ioc容器的实现" class="headerlink" title="二、Spring核心：ioc容器的实现"></a>二、Spring核心：ioc容器的实现</h1><p>ioc容器是以BeanFactory作为最基本的接口类，里面定义了ioc的基本轮廓，BeanFactory设计了getBean方法，这个方法时IOC容器API的主要方法。</p>
+<h2 id="2-1-XmlBeanFactory的工作原理"><a href="#2-1-XmlBeanFactory的工作原理" class="headerlink" title="2.1 XmlBeanFactory的工作原理"></a>2.1 XmlBeanFactory的工作原理</h2><p>在这个基础上Spring提供了一系列基于BeanFactory容器的其他容器的实现方式</p>
+<p><img src="/.com//image-20200302104359763.png" alt="image-20200302104359763"></p>
+<p>从这个容器最底层的实现XMLBeanFactory来看，他可以读取以XML形式定义的BeanFactory。</p>
+<p>在使用这个容器时，需要以下几个步骤：</p>
+<ul>
+<li>创建IOC配置文件的抽象资源，这个抽象资源包含了BeanDefinition的定义信息。</li>
+<li>创建BeanFactory，这里使用的是DefaultListableFactory。</li>
+<li>创建一个载入BeanDefinition的读取器，这里使用的XmlBeanDefinitionReader来载入XML文件形式的BeanDefinition，通过一个回调配置给BeanFactory。</li>
+<li>从定义好的资源位置读入配置信息，具体解析过程由XmlBeanDefinitionReader来完成，完成整个载入和注册Bean定义之后，需要的ioc容器就建立起来了，可以直接使用了。</li>
+</ul>
+<h2 id="2-2-ApplicationContext的特点"><a href="#2-2-ApplicationContext的特点" class="headerlink" title="2.2 ApplicationContext的特点"></a>2.2 ApplicationContext的特点</h2><p>spring已经提供了许多定义好的容器的实现，使用ApplicationContext除了可以使用一些基本功能外，还为用户提供了附加的服务。</p>
+<h2 id="2-3-IOC容器的初始化"><a href="#2-3-IOC容器的初始化" class="headerlink" title="2.3 IOC容器的初始化"></a>2.3 IOC容器的初始化</h2><p>Ioc容器的初始化包含BeanDefinition的Resource定位，载入和注册这三个基本的过程。spring在实现中是把这三个过程分开并使用不同的模块来完成，这样可以让用户更加灵活地对这3个过程进行剪裁和扩展，定义出最适合自己的Ioc容器的初始化过程。</p>
+<p>第一步关键的部分是：BeanDefinition的资源定位由ResourceLoader通过统一的Resource接口来完成，Resource对各种形式的BeanDefinition的使用提供了统一的接口，如FileSystemResource，ClassPathResource;就像打水一样，要先找到水。</p>
+<p>第二步关键的是：BeanDefinition的载入，把用户定义好的Bean表示成Ioc容器内部的数据结构，而这个容器内部的数据结构就是BeanDefinition。这个BeanDefinition实际上就是POJO对象在IOC容器中的抽象。</p>
+<p>第三步关键的是：向IOC容器注册这些BeanDefinition的过程，通过调用BeanDefinitionRegistry来实现，这个注册过程把载入过程中解析得到的BeanDefinition向Ioc进行注册，ioc内部是使用HashMap来持有这些数据的。</p>
+<h3 id="2-3-1-BeanDefinition的Resource定位"><a href="#2-3-1-BeanDefinition的Resource定位" class="headerlink" title="2.3.1 BeanDefinition的Resource定位"></a>2.3.1 BeanDefinition的Resource定位</h3><p>当我们用编程方式使用DefaultListableBeanFactory时，我们看到，他会首先定义一个Resource来定位容器使用的BeanDefinition，这时Spring会使用ClassPathResource代表类路径中寻找以文件形式存在的BeanDefinition的信息。但是这个Resource并不能被DefaultListableBeanFactory直接使用，它需要通过BeanDefinitionReader来对这些信息进行处理。使用ApplicationContext就不同了，在applicationContext中，spring已经给我提供了一系列记载不同Resource的读取器的实现，而DefaultListableBeanFactory只是一个纯粹的Ioc容器。</p>
+<h3 id="2-3-2-BeanDefinition的载入和解析"><a href="#2-3-2-BeanDefinition的载入和解析" class="headerlink" title="2.3.2 BeanDefinition的载入和解析"></a>2.3.2 BeanDefinition的载入和解析</h3><p>###2.3.3 BeanDefinition 在ioc容器中的注册</p>
+<h1 id="三、Spring核心：Aop的实现"><a href="#三、Spring核心：Aop的实现" class="headerlink" title="三、Spring核心：Aop的实现"></a>三、Spring核心：Aop的实现</h1><h1 id="四、Spring-MVC与web环境"><a href="#四、Spring-MVC与web环境" class="headerlink" title="四、Spring MVC与web环境"></a>四、Spring MVC与web环境</h1><h1 id="五、数据库操作组件的实现"><a href="#五、数据库操作组件的实现" class="headerlink" title="五、数据库操作组件的实现"></a>五、数据库操作组件的实现</h1><h1 id="六、Spring事务的实现"><a href="#六、Spring事务的实现" class="headerlink" title="六、Spring事务的实现"></a>六、Spring事务的实现</h1><p><img src="/.com//g" alt="img"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/02/28/spring/" data-id="ck7yfki640007thad2um4gzju" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/03/19/Spring%E7%9A%84IoC%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Spring的IoC源码解析
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/01/30/java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9B%B8%E5%85%B3/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">java虚拟机相关</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/03/19/Spring%E7%9A%84IoC%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">Spring的IoC源码解析</a>
+          </li>
+        
+          <li>
+            <a href="/2020/02/28/spring/">spring</a>
+          </li>
+        
+          <li>
+            <a href="/2020/01/30/java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9B%B8%E5%85%B3/">java虚拟机相关</a>
+          </li>
+        
+          <li>
+            <a href="/2020/01/17/%E4%BC%98%E7%A7%80%E7%BD%91%E5%9D%80%E6%B1%87%E6%80%BB/">优秀网址汇总</a>
+          </li>
+        
+          <li>
+            <a href="/2020/01/09/idea%E5%BF%AB%E6%8D%B7%E4%BD%BF%E7%94%A8/">idea快捷使用</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
