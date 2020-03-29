@@ -64,6 +64,98 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-mybatis详解" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/29/mybatis%E8%AF%A6%E8%A7%A3/" class="article-date">
+  <time datetime="2020-03-29T03:10:39.000Z" itemprop="datePublished">2020-03-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/29/mybatis%E8%AF%A6%E8%A7%A3/">mybatis详解</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="mybatis详解"><a href="#mybatis详解" class="headerlink" title="mybatis详解"></a>mybatis详解</h1><h2 id="一、Mybatis整体架构"><a href="#一、Mybatis整体架构" class="headerlink" title="一、Mybatis整体架构"></a>一、Mybatis整体架构</h2><p><img src="/.com//image-20200329111310993.png" alt="image-20200329111310993"></p>
+<p>sql的执行过程如下：</p>
+<p><img src="/.com//image-20200329150253572.png" alt="image-20200329150253572"></p>
+<h2 id="二、基础支持层"><a href="#二、基础支持层" class="headerlink" title="二、基础支持层"></a>二、基础支持层</h2><h3 id="2-1解析器模块"><a href="#2-1解析器模块" class="headerlink" title="2.1解析器模块"></a>2.1解析器模块</h3><p>使用DOM(Document Object Model)和SAX(Simple Api for XML)解析方式</p>
+<h3 id="2-2反射模块"><a href="#2-2反射模块" class="headerlink" title="2.2反射模块"></a>2.2反射模块</h3><p>Mybaits在进行参数处理、结果映射时会涉及大量反射操作，java反射功能很强大，但是代码写起来容易有问题，所以我们有反射模块位于org.apache.ibatis.reflection包中，对反射进行了进一步的包装，提供了简单的反射API</p>
+<h3 id="2-3类型转换"><a href="#2-3类型转换" class="headerlink" title="2.3类型转换"></a>2.3类型转换</h3><p>JDBC数据类型和java语言中的数据类型并不是完全对应的，所以在PreparedStatement为SQL语句绑定参数时，需要从java类型转换为jdbc类型，而从结果集获取数据时，则需要从jdbc转换成java类型。</p>
+<p><img src="/.com//image-20200329112809055.png" alt="image-20200329112809055"></p>
+<p>mybatis所有的类型转换都继承了TypeHandler</p>
+<p><img src="/.com//image-20200329113404056.png" alt="image-20200329113404056"></p>
+<h3 id="2-4日志模块"><a href="#2-4日志模块" class="headerlink" title="2.4日志模块"></a>2.4日志模块</h3><h3 id="2-5资源加载"><a href="#2-5资源加载" class="headerlink" title="2.5资源加载"></a>2.5资源加载</h3><h3 id="2-6DataSource"><a href="#2-6DataSource" class="headerlink" title="2.6DataSource"></a>2.6DataSource</h3><h3 id="2-7Transaction"><a href="#2-7Transaction" class="headerlink" title="2.7Transaction"></a>2.7Transaction</h3><h3 id="2-8binding模块"><a href="#2-8binding模块" class="headerlink" title="2.8binding模块"></a>2.8binding模块</h3><h3 id="2-9缓存模块"><a href="#2-9缓存模块" class="headerlink" title="2.9缓存模块"></a>2.9缓存模块</h3><h2 id="三、核心处理层"><a href="#三、核心处理层" class="headerlink" title="三、核心处理层"></a>三、核心处理层</h2><h3 id="3-1Mybatis初始化"><a href="#3-1Mybatis初始化" class="headerlink" title="3.1Mybatis初始化"></a>3.1Mybatis初始化</h3><h4 id="3-1-1建造者模式"><a href="#3-1-1建造者模式" class="headerlink" title="3.1.1建造者模式"></a>3.1.1建造者模式</h4><p>在搭建大型框架的时候，我们需要建造组成这个框架的各个部分，然后分阶段把他们组装起来。</p>
+<p><img src="/.com//image-20200329142806545.png" alt="image-20200329142806545"></p>
+<p>该示例是输出的文本内容相同，但是组装的格式各不相同，一份是文档的，一份是HTML的，具体代码如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">*抽象类，定义生成文件的步骤，这些步骤不管是文档的还是html的都是需要经历的步骤</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">makeTitle</span><span class="params">(String title)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">makeString</span><span class="params">(String str)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">makeItems</span><span class="params">(String[] items)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 负责调用抽象类来输出他们的文档，具体调用哪个实现类，由个人意愿决定</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@AllArgsConstructor</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Director</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Builder builder;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">construct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        builder.makeTitle(<span class="string">"Greeting"</span>);</span><br><span class="line">        builder.makeString(<span class="string">"从早上至下午"</span>);</span><br><span class="line">        builder.makeItems(<span class="keyword">new</span> String[]&#123;</span><br><span class="line">                <span class="string">"早上好。"</span>,</span><br><span class="line">                <span class="string">"下午好。"</span>,</span><br><span class="line">        &#125;);</span><br><span class="line">        builder.makeString(<span class="string">"晚上"</span>);</span><br><span class="line">        builder.makeItems(<span class="keyword">new</span> String[]&#123;</span><br><span class="line">                <span class="string">"晚上好。"</span>,</span><br><span class="line">                <span class="string">"晚安。"</span>,</span><br><span class="line">                <span class="string">"再见。"</span>,</span><br><span class="line">        &#125;);</span><br><span class="line">        builder.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TextBuilder</span> <span class="keyword">extends</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> StringBuffer buffer = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">makeTitle</span><span class="params">(String title)</span> </span>&#123;</span><br><span class="line">        buffer.append(<span class="string">"===========================\n"</span>);</span><br><span class="line">        buffer.append(<span class="string">"["</span> +title + <span class="string">"]\n"</span>);</span><br><span class="line">        buffer.append(<span class="string">"\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">makeString</span><span class="params">(String str)</span> </span>&#123;</span><br><span class="line">        buffer.append(<span class="string">'@'</span> + str + <span class="string">"\n"</span>);</span><br><span class="line">        buffer.append(<span class="string">"\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">makeItems</span><span class="params">(String[] items)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; items.length;i++) &#123;</span><br><span class="line">            buffer.append(<span class="string">"  ."</span> + items[i] + <span class="string">"\n"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        buffer.append(<span class="string">"\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        buffer.append(<span class="string">"==================================\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getResult</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> buffer.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HTMLBuilder</span> <span class="keyword">extends</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String filename;</span><br><span class="line">    <span class="keyword">private</span> PrintWriter writer;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">makeTitle</span><span class="params">(String title)</span> </span>&#123;</span><br><span class="line">        filename = title + <span class="string">".html"</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            writer = <span class="keyword">new</span> PrintWriter(<span class="keyword">new</span> FileWriter(filename));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        writer.println(<span class="string">"&lt;html&gt;&lt;head&gt;&lt;title&gt;"</span> + title + <span class="string">"&lt;/title&gt;&lt;/head&gt;&lt;body&gt;"</span>);</span><br><span class="line">        writer.println(<span class="string">"&lt;h1&gt;"</span> + title + <span class="string">"&lt;/h1&gt;"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">makeString</span><span class="params">(String str)</span> </span>&#123;</span><br><span class="line">        writer.println(<span class="string">"&lt;p&gt;"</span> +str + <span class="string">"&lt;/p&gt;"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">makeItems</span><span class="params">(String[] items)</span> </span>&#123;</span><br><span class="line">        writer.println(<span class="string">"&lt;ul&gt;"</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; items.length;i++) &#123;</span><br><span class="line">            writer.println(<span class="string">"&lt;li&gt;"</span> + items[i] + <span class="string">"&lt;/li&gt;"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        writer.println(<span class="string">"&lt;/ul&gt;"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        writer.println(<span class="string">"&lt;/body&gt;&lt;/html&gt;"</span>);</span><br><span class="line">        writer.close();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getResult</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> filename;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (args.length != <span class="number">1</span>) &#123;</span><br><span class="line">            usage();</span><br><span class="line">            System.exit(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//如果格式文件的，那么我们需要传入textBuilder</span></span><br><span class="line">        <span class="keyword">if</span> (args[<span class="number">0</span>].equals(<span class="string">"plain"</span>)) &#123;</span><br><span class="line">            TextBuilder textBuilder = <span class="keyword">new</span> TextBuilder();</span><br><span class="line">            Director director = <span class="keyword">new</span> Director(textBuilder);</span><br><span class="line">            director.construct();</span><br><span class="line">            String result = textBuilder.getResult();</span><br><span class="line">            System.out.println(result);</span><br><span class="line">        <span class="comment">//如果是html的，那么我们需要传入HtmlBuilder    </span></span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span> (args[<span class="number">0</span>].equals(<span class="string">"html"</span>)) &#123;</span><br><span class="line">            HTMLBuilder htmlBuilder = <span class="keyword">new</span> HTMLBuilder();</span><br><span class="line">            Director director = <span class="keyword">new</span> Director(htmlBuilder);</span><br><span class="line">            director.construct();</span><br><span class="line">            String filename = htmlBuilder.getResult();</span><br><span class="line">            System.out.println(filename + <span class="string">"文件编写完成"</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            usage();</span><br><span class="line">            System.exit(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">usage</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Usage: java Main plain      编写纯文本文档"</span>);</span><br><span class="line">        System.out.println(<span class="string">"Usage: java Main html       编写HTML文档"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Mybatis的</p>
+<p><img src="/.com//image-20200329143438176.png" alt="image-20200329143438176"></p>
+<p>BaseBuilder就是定义的这个抽象类，其中的方法有</p>
+<p><img src="/.com//image-20200329145637397.png" alt="image-20200329145637397"></p>
+<p>baseBuilder的实现类类型，XmlConfigBuilder是解析整个config的配置项的，XmlMapper是解析namespace模块的，XmlStatement是解析单个sql模块的……</p>
+<p><img src="/.com//image-20200329150020147.png" alt="image-20200329150020147"></p>
+<h3 id="3-2-SqlNode-amp-SqlSource"><a href="#3-2-SqlNode-amp-SqlSource" class="headerlink" title="3.2 SqlNode&amp;SqlSource"></a>3.2 SqlNode&amp;SqlSource</h3><h3 id="3-3-ResultSetHandler"><a href="#3-3-ResultSetHandler" class="headerlink" title="3.3 ResultSetHandler"></a>3.3 ResultSetHandler</h3><h3 id="3-4-KeyGernrator"><a href="#3-4-KeyGernrator" class="headerlink" title="3.4 KeyGernrator"></a>3.4 KeyGernrator</h3><h3 id="3-5-StatementHandler"><a href="#3-5-StatementHandler" class="headerlink" title="3.5 StatementHandler"></a>3.5 StatementHandler</h3><h3 id="3-6-Executor"><a href="#3-6-Executor" class="headerlink" title="3.6 Executor"></a>3.6 Executor</h3><p><img src="/.com//image-20200329153140246.png" alt="image-20200329153140246"></p>
+<h4 id="3-6-1模板方法模式"><a href="#3-6-1模板方法模式" class="headerlink" title="3.6.1模板方法模式"></a>3.6.1模板方法模式</h4><h4 id="3-6-2-BaseExecutor"><a href="#3-6-2-BaseExecutor" class="headerlink" title="3.6.2 BaseExecutor"></a>3.6.2 BaseExecutor</h4><p>BaseExecutor的基本方法</p>
+<p><img src="/.com//image-20200329153451254.png" alt="image-20200329153451254"></p>
+<p>#####3.6.2.1 一级缓存</p>
+<p>一级缓存是会话级别的缓存，在mybatis中每创建一个sqlSession对象，就表示开启一次数据库会话。在一次会话中，应用程序可能在短时间内，例如一次事务中，反复查询相同语句。</p>
+<p>一级缓存的生命周期与SqlSession相同，其实也就是与SqlSession封装的Executor对象的声明周期相同，当调用close()时，该Executor中的一级缓存就不可用了。但是一级缓存的存活时间是会有很多因素影响的，如果调用了Executor.update()（这个方法负责执行insert，update，delete三类Sql语句）时，会先清空缓存内容。</p>
+<h5 id="3-6-2-1-一级缓存的管理"><a href="#3-6-2-1-一级缓存的管理" class="headerlink" title="3.6.2.1 一级缓存的管理"></a>3.6.2.1 一级缓存的管理</h5><p>如执行query方法</p>
+<p><img src="/.com//image-20200329154148650.png" alt="image-20200329154148650"></p>
+<p>CacheKey由MappedStatement的id，对应的offset和limit、sql语句（包含？占位符）、用户传递的实参，以及Environment 的id这五部分组成。</p>
+<h4 id="3-6-3-SimpleExecutor"><a href="#3-6-3-SimpleExecutor" class="headerlink" title="3.6.3 SimpleExecutor"></a>3.6.3 SimpleExecutor</h4><p>继承了BaseExecutor，简单版</p>
+<h4 id="3-6-4-ReuseExecutor"><a href="#3-6-4-ReuseExecutor" class="headerlink" title="3.6.4 ReuseExecutor"></a>3.6.4 ReuseExecutor</h4><p>重用statement对象</p>
+<h4 id="3-6-5-BatchExecutor"><a href="#3-6-5-BatchExecutor" class="headerlink" title="3.6.5 BatchExecutor"></a>3.6.5 BatchExecutor</h4><p>批量发送很多条sql到数据库</p>
+<p>####3.6.6 CachingExecutor</p>
+<p>CachingExecutor是一个Executor接口的装饰器，他为Executor增加了二级缓存相关功能。</p>
+<h5 id="3-6-6-1-二级缓存"><a href="#3-6-6-1-二级缓存" class="headerlink" title="3.6.6.1 二级缓存"></a>3.6.6.1 二级缓存</h5><p>Mybaits的二级缓存是应用级别的，他的生命周期与应用程序的声明周期相同</p>
+<p><img src="/.com//image-20200329155250221.png" alt="image-20200329155250221"></p>
+<p><img src="/.com//image-20200329155301002.png" alt="image-20200329155301002"></p>
+<h2 id="四、高级主题"><a href="#四、高级主题" class="headerlink" title="四、高级主题"></a>四、高级主题</h2><h3 id="4-1-插件模块"><a href="#4-1-插件模块" class="headerlink" title="4.1 插件模块"></a>4.1 插件模块</h3><p>mybatis虽然叫插件化，但是是通过Interceptor实现的，mybaits中的插件模块中，涉及责任链模式和JDK动态代理。Mybatis允许拦截器拦截Excutors的方法、ParameterHandler方法、ResultSetHandler的方法以及StatementHandler的方法。</p>
+<p>父类是Interceptor</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Interceptor</span> </span>&#123;</span><br><span class="line">    <span class="comment">//执行拦截逻辑的方法</span></span><br><span class="line">    <span class="function">Object <span class="title">intercept</span><span class="params">(Invocation var1)</span> <span class="keyword">throws</span> Throwable</span>;</span><br><span class="line">	<span class="comment">//决定是否触发Interceptor方法</span></span><br><span class="line">    <span class="function">Object <span class="title">plugin</span><span class="params">(Object var1)</span></span>;</span><br><span class="line">    <span class="comment">//根据配置初始化Interceptor对象</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setProperties</span><span class="params">(Properties var1)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用户自定义的拦截器除了继承Inerceptor接口，还需要使用@Interceptor和@Signature注解进行标识，@Interceptor注解中指定了一个@Signature注解列表，每个@Signature注解中都标识了该插件需要拦截的方法信息。</p>
+<p><img src="/.com//image-20200329151913416.png" alt="image-20200329151913416"></p>
+<p>定义完一个自定义的拦截器之后，需要在mybatis-config.xml配置文件中对该拦截器进行配置。</p>
+<p><img src="/.com//image-20200329152048242.png" alt="image-20200329152048242"></p>
+<p>插件如何生效？</p>
+<p><img src="/.com//image-20200329152254258.png" alt="image-20200329152254258"></p>
+<p>遍历interceptors集合，并调用每个元素的plugin（）创建代理对象。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/29/mybatis%E8%AF%A6%E8%A7%A3/" data-id="ck8cs5a0t0000o8adc90ug2cf" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Spring的IoC源码解析" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/03/19/Spring%E7%9A%84IoC%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" class="article-date">
@@ -118,6 +210,7 @@
 <li>我们看到它扩展了MessageSource接口，这些信息源的扩展功能可以支持国际化的实现，为开发多语言版本的应用提供服务。</li>
 <li>访问资源。体现在ResourceLoader和Resource的支持上，这样我们可以从不同的地方得到Bean定义资源。</li>
 <li>支持应用事件。继承了接口ApplicationEventPublisher,这样在上下文中引入了事件机制，这些事件和Bean的生命周期的结合为Bean的管理提供了便利。</li>
+<li>​</li>
 <li>ApplicationContext具备了丰富的附加功能，使得ApplicationContext与简单的BeanFactory相比，对它的使用是一种面向框架的使用风格，开发时一般使用建议使用ApplicationContext。</li>
 </ul>
 <h3 id="2-4-Ioc容器初始化"><a href="#2-4-Ioc容器初始化" class="headerlink" title="2.4 Ioc容器初始化"></a>2.4 Ioc容器初始化</h3><p>初始化过程包括：BeanDefinition的Resource定位、载入、注册这三个基本过程。</p>
@@ -125,7 +218,19 @@
 <p>②：载入：BeanDefinition的载入，该载入过程把用户定义好的Bean表示成IoC容器的内部数据结构，而这个容器的内部的数据结构就是BeanDefinition。</p>
 <p>③：注册：向IoC容器注册这些BeanDefinition的过程，这个过程是通过调用BeanDefinitionRegistry接口的实现来完成的。Ioc内部是使用一个HashMap来维持这些BeanDefinition数据的。</p>
 <p>注意：Ioc容器和上下文初始化一般不包括Bean的依赖注入的实现。一般而言，依赖注入发生在应用第一次向容器通过getBean索取Bean时。但是有例外：ioc容器有一个预实例化的配置，可以通过在Bean定义信息中的lazyInit属性来设定，有了这个预实例化的配置，使得这个Bean的依赖注入在Ioc容器初始化时就预先完成了。</p>
-<h4 id="2-4-1-BeanDefinition的Resource定位"><a href="#2-4-1-BeanDefinition的Resource定位" class="headerlink" title="2.4.1 BeanDefinition的Resource定位"></a>2.4.1 BeanDefinition的Resource定位</h4><p>画出spring定位时的代码流程图</p>
+<h4 id="2-4-1-BeanDefinition的Resource定位"><a href="#2-4-1-BeanDefinition的Resource定位" class="headerlink" title="2.4.1 BeanDefinition的Resource定位"></a>2.4.1 BeanDefinition的Resource定位</h4><p><img src="/.com//diagram.png" alt="image-20200319163730289"></p>
+<p>画出spring定位时的代码流程图</p>
+<h4 id="2-4-1-BeanDefinition在IoC中的注册"><a href="#2-4-1-BeanDefinition在IoC中的注册" class="headerlink" title="2.4.1 BeanDefinition在IoC中的注册"></a>2.4.1 BeanDefinition在IoC中的注册</h4><p>注册的过程是发生在DefaultListableBeanFactory中的registerBeanDefinition方法中。填充到concurrentHashMap的definitionMap中</p>
+<h4 id="2-4-2-IoC容器的依赖注入"><a href="#2-4-2-IoC容器的依赖注入" class="headerlink" title="2.4.2 IoC容器的依赖注入"></a>2.4.2 IoC容器的依赖注入</h4><p>首先依赖注入是发生在用户第一次向Ioc索要bean时触发的，但是也有例外，如lazy_init属性可以完成对Bean的预实例化具体流程见流程图</p>
+<h3 id="2-5容器的其他相关特性的实现"><a href="#2-5容器的其他相关特性的实现" class="headerlink" title="2.5容器的其他相关特性的实现"></a>2.5容器的其他相关特性的实现</h3><h4 id="2-5-1lazy-init属性和预实例化"><a href="#2-5-1lazy-init属性和预实例化" class="headerlink" title="2.5.1lazy_init属性和预实例化"></a>2.5.1lazy_init属性和预实例化</h4><p>预实例化时发生在AbstractApplicationContext中的refresh方法中实现的</p>
+<p><img src="/.com//image-20200321114315588.png" alt="image-20200321114315588"></p>
+<p>最后实在DefaultListableBeanFactory中的preInstantiateSingletons中实现的</p>
+<p><img src="/.com//image-20200321114428783.png" alt="image-20200321114428783"></p>
+<h4 id="2-5-2FactoryBean的实现"><a href="#2-5-2FactoryBean的实现" class="headerlink" title="2.5.2FactoryBean的实现"></a>2.5.2FactoryBean的实现</h4><p>FactoryBean是一个能生产或修饰对象生成的工厂Bean。一个Bean如果实现了FactoryBean接口，那么根据该Bean的名称获取到的实际上是getObject()返回的对象，而不是这个Bean自身实例，如果要获取这个Bean自身实例，那么需要在名称前面加上’&amp;’符号。</p>
+<p><a href="https://www.cnblogs.com/guitu18/p/11284894.html" target="_blank" rel="noopener">https://www.cnblogs.com/guitu18/p/11284894.html</a></p>
+<h4 id="2-5-3BeanPostProcessor的实现"><a href="#2-5-3BeanPostProcessor的实现" class="headerlink" title="2.5.3BeanPostProcessor的实现"></a>2.5.3BeanPostProcessor的实现</h4><h2 id="5-spring对jdbc的支持"><a href="#5-spring对jdbc的支持" class="headerlink" title="5.spring对jdbc的支持"></a>5.spring对jdbc的支持</h2><h3 id="5-1jdbcTemplate"><a href="#5-1jdbcTemplate" class="headerlink" title="5.1jdbcTemplate"></a>5.1jdbcTemplate</h3><p>spring主要通过jdbcTemplate来操作数据库</p>
+<p><img src="/.com//image-20200321144804722.png" alt="image-20200321144804722"></p>
+<p>spring与ibatis的结合，使用的是FactoryBean来完成对iBatis的配置，结合了Template来封装相应的操作</p>
 
       
     </div>
@@ -847,44 +952,12 @@
 
 
   
-    <article id="post-Hello" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/12/29/Hello/" class="article-date">
-  <time datetime="2019-12-29T07:59:16.000Z" itemprop="datePublished">2019-12-29</time>
-</a>
+
+
+  <nav id="page-nav">
     
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/12/29/Hello/">Hello</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>this is my first blog ,nice to see you!</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/29/Hello/" data-id="ck7yfki5w0001thad7quj35il" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
+  </nav>
 
 </section>
         
@@ -915,6 +988,10 @@
       <ul>
         
           <li>
+            <a href="/2020/03/29/mybatis%E8%AF%A6%E8%A7%A3/">mybatis详解</a>
+          </li>
+        
+          <li>
             <a href="/2020/03/19/Spring%E7%9A%84IoC%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">Spring的IoC源码解析</a>
           </li>
         
@@ -928,10 +1005,6 @@
         
           <li>
             <a href="/2020/01/17/%E4%BC%98%E7%A7%80%E7%BD%91%E5%9D%80%E6%B1%87%E6%80%BB/">优秀网址汇总</a>
-          </li>
-        
-          <li>
-            <a href="/2020/01/09/idea%E5%BF%AB%E6%8D%B7%E4%BD%BF%E7%94%A8/">idea快捷使用</a>
           </li>
         
       </ul>

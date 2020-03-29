@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>mybatis详解 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="mybatis详解一、Mybatis整体架构 sql的执行过程如下：  二、基础支持层2.1解析器模块使用DOM(Document Object Model)和SAX(Simple Api for XML)解析方式 2.2反射模块Mybaits在进行参数处理、结果映射时会涉及大量反射操作，java反射功能很强大，但是代码写起来容易有问题，所以我们有反射模块位于org.apache.ibatis.r">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mybatis详解">
+<meta property="og:url" content="http://yoursite.com/2020/03/29/mybatis%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="mybatis详解一、Mybatis整体架构 sql的执行过程如下：  二、基础支持层2.1解析器模块使用DOM(Document Object Model)和SAX(Simple Api for XML)解析方式 2.2反射模块Mybaits在进行参数处理、结果映射时会涉及大量反射操作，java反射功能很强大，但是代码写起来容易有问题，所以我们有反射模块位于org.apache.ibatis.r">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329111310993.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329150253572.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329112809055.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329113404056.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329142806545.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329143438176.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329145637397.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329150020147.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329153140246.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329153451254.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329154148650.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329155250221.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329155301002.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329151913416.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329152048242.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200329152254258.png">
+<meta property="article:published_time" content="2020-03-29T03:10:39.000Z">
+<meta property="article:modified_time" content="2020-03-29T08:26:38.723Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/.com//image-20200329111310993.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-mybatis详解" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/29/mybatis%E8%AF%A6%E8%A7%A3/" class="article-date">
+  <time datetime="2020-03-29T03:10:39.000Z" itemprop="datePublished">2020-03-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      mybatis详解
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="mybatis详解"><a href="#mybatis详解" class="headerlink" title="mybatis详解"></a>mybatis详解</h1><h2 id="一、Mybatis整体架构"><a href="#一、Mybatis整体架构" class="headerlink" title="一、Mybatis整体架构"></a>一、Mybatis整体架构</h2><p><img src="/.com//image-20200329111310993.png" alt="image-20200329111310993"></p>
+<p>sql的执行过程如下：</p>
+<p><img src="/.com//image-20200329150253572.png" alt="image-20200329150253572"></p>
+<h2 id="二、基础支持层"><a href="#二、基础支持层" class="headerlink" title="二、基础支持层"></a>二、基础支持层</h2><h3 id="2-1解析器模块"><a href="#2-1解析器模块" class="headerlink" title="2.1解析器模块"></a>2.1解析器模块</h3><p>使用DOM(Document Object Model)和SAX(Simple Api for XML)解析方式</p>
+<h3 id="2-2反射模块"><a href="#2-2反射模块" class="headerlink" title="2.2反射模块"></a>2.2反射模块</h3><p>Mybaits在进行参数处理、结果映射时会涉及大量反射操作，java反射功能很强大，但是代码写起来容易有问题，所以我们有反射模块位于org.apache.ibatis.reflection包中，对反射进行了进一步的包装，提供了简单的反射API</p>
+<h3 id="2-3类型转换"><a href="#2-3类型转换" class="headerlink" title="2.3类型转换"></a>2.3类型转换</h3><p>JDBC数据类型和java语言中的数据类型并不是完全对应的，所以在PreparedStatement为SQL语句绑定参数时，需要从java类型转换为jdbc类型，而从结果集获取数据时，则需要从jdbc转换成java类型。</p>
+<p><img src="/.com//image-20200329112809055.png" alt="image-20200329112809055"></p>
+<p>mybatis所有的类型转换都继承了TypeHandler</p>
+<p><img src="/.com//image-20200329113404056.png" alt="image-20200329113404056"></p>
+<h3 id="2-4日志模块"><a href="#2-4日志模块" class="headerlink" title="2.4日志模块"></a>2.4日志模块</h3><h3 id="2-5资源加载"><a href="#2-5资源加载" class="headerlink" title="2.5资源加载"></a>2.5资源加载</h3><h3 id="2-6DataSource"><a href="#2-6DataSource" class="headerlink" title="2.6DataSource"></a>2.6DataSource</h3><h3 id="2-7Transaction"><a href="#2-7Transaction" class="headerlink" title="2.7Transaction"></a>2.7Transaction</h3><h3 id="2-8binding模块"><a href="#2-8binding模块" class="headerlink" title="2.8binding模块"></a>2.8binding模块</h3><h3 id="2-9缓存模块"><a href="#2-9缓存模块" class="headerlink" title="2.9缓存模块"></a>2.9缓存模块</h3><h2 id="三、核心处理层"><a href="#三、核心处理层" class="headerlink" title="三、核心处理层"></a>三、核心处理层</h2><h3 id="3-1Mybatis初始化"><a href="#3-1Mybatis初始化" class="headerlink" title="3.1Mybatis初始化"></a>3.1Mybatis初始化</h3><h4 id="3-1-1建造者模式"><a href="#3-1-1建造者模式" class="headerlink" title="3.1.1建造者模式"></a>3.1.1建造者模式</h4><p>在搭建大型框架的时候，我们需要建造组成这个框架的各个部分，然后分阶段把他们组装起来。</p>
+<p><img src="/.com//image-20200329142806545.png" alt="image-20200329142806545"></p>
+<p>该示例是输出的文本内容相同，但是组装的格式各不相同，一份是文档的，一份是HTML的，具体代码如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">*抽象类，定义生成文件的步骤，这些步骤不管是文档的还是html的都是需要经历的步骤</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">makeTitle</span><span class="params">(String title)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">makeString</span><span class="params">(String str)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">makeItems</span><span class="params">(String[] items)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 负责调用抽象类来输出他们的文档，具体调用哪个实现类，由个人意愿决定</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@AllArgsConstructor</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Director</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Builder builder;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">construct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        builder.makeTitle(<span class="string">"Greeting"</span>);</span><br><span class="line">        builder.makeString(<span class="string">"从早上至下午"</span>);</span><br><span class="line">        builder.makeItems(<span class="keyword">new</span> String[]&#123;</span><br><span class="line">                <span class="string">"早上好。"</span>,</span><br><span class="line">                <span class="string">"下午好。"</span>,</span><br><span class="line">        &#125;);</span><br><span class="line">        builder.makeString(<span class="string">"晚上"</span>);</span><br><span class="line">        builder.makeItems(<span class="keyword">new</span> String[]&#123;</span><br><span class="line">                <span class="string">"晚上好。"</span>,</span><br><span class="line">                <span class="string">"晚安。"</span>,</span><br><span class="line">                <span class="string">"再见。"</span>,</span><br><span class="line">        &#125;);</span><br><span class="line">        builder.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TextBuilder</span> <span class="keyword">extends</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> StringBuffer buffer = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">makeTitle</span><span class="params">(String title)</span> </span>&#123;</span><br><span class="line">        buffer.append(<span class="string">"===========================\n"</span>);</span><br><span class="line">        buffer.append(<span class="string">"["</span> +title + <span class="string">"]\n"</span>);</span><br><span class="line">        buffer.append(<span class="string">"\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">makeString</span><span class="params">(String str)</span> </span>&#123;</span><br><span class="line">        buffer.append(<span class="string">'@'</span> + str + <span class="string">"\n"</span>);</span><br><span class="line">        buffer.append(<span class="string">"\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">makeItems</span><span class="params">(String[] items)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; items.length;i++) &#123;</span><br><span class="line">            buffer.append(<span class="string">"  ."</span> + items[i] + <span class="string">"\n"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        buffer.append(<span class="string">"\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        buffer.append(<span class="string">"==================================\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getResult</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> buffer.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HTMLBuilder</span> <span class="keyword">extends</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String filename;</span><br><span class="line">    <span class="keyword">private</span> PrintWriter writer;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">makeTitle</span><span class="params">(String title)</span> </span>&#123;</span><br><span class="line">        filename = title + <span class="string">".html"</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            writer = <span class="keyword">new</span> PrintWriter(<span class="keyword">new</span> FileWriter(filename));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        writer.println(<span class="string">"&lt;html&gt;&lt;head&gt;&lt;title&gt;"</span> + title + <span class="string">"&lt;/title&gt;&lt;/head&gt;&lt;body&gt;"</span>);</span><br><span class="line">        writer.println(<span class="string">"&lt;h1&gt;"</span> + title + <span class="string">"&lt;/h1&gt;"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">makeString</span><span class="params">(String str)</span> </span>&#123;</span><br><span class="line">        writer.println(<span class="string">"&lt;p&gt;"</span> +str + <span class="string">"&lt;/p&gt;"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">makeItems</span><span class="params">(String[] items)</span> </span>&#123;</span><br><span class="line">        writer.println(<span class="string">"&lt;ul&gt;"</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; items.length;i++) &#123;</span><br><span class="line">            writer.println(<span class="string">"&lt;li&gt;"</span> + items[i] + <span class="string">"&lt;/li&gt;"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        writer.println(<span class="string">"&lt;/ul&gt;"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        writer.println(<span class="string">"&lt;/body&gt;&lt;/html&gt;"</span>);</span><br><span class="line">        writer.close();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getResult</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> filename;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (args.length != <span class="number">1</span>) &#123;</span><br><span class="line">            usage();</span><br><span class="line">            System.exit(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//如果格式文件的，那么我们需要传入textBuilder</span></span><br><span class="line">        <span class="keyword">if</span> (args[<span class="number">0</span>].equals(<span class="string">"plain"</span>)) &#123;</span><br><span class="line">            TextBuilder textBuilder = <span class="keyword">new</span> TextBuilder();</span><br><span class="line">            Director director = <span class="keyword">new</span> Director(textBuilder);</span><br><span class="line">            director.construct();</span><br><span class="line">            String result = textBuilder.getResult();</span><br><span class="line">            System.out.println(result);</span><br><span class="line">        <span class="comment">//如果是html的，那么我们需要传入HtmlBuilder    </span></span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span> (args[<span class="number">0</span>].equals(<span class="string">"html"</span>)) &#123;</span><br><span class="line">            HTMLBuilder htmlBuilder = <span class="keyword">new</span> HTMLBuilder();</span><br><span class="line">            Director director = <span class="keyword">new</span> Director(htmlBuilder);</span><br><span class="line">            director.construct();</span><br><span class="line">            String filename = htmlBuilder.getResult();</span><br><span class="line">            System.out.println(filename + <span class="string">"文件编写完成"</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            usage();</span><br><span class="line">            System.exit(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">usage</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Usage: java Main plain      编写纯文本文档"</span>);</span><br><span class="line">        System.out.println(<span class="string">"Usage: java Main html       编写HTML文档"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Mybatis的</p>
+<p><img src="/.com//image-20200329143438176.png" alt="image-20200329143438176"></p>
+<p>BaseBuilder就是定义的这个抽象类，其中的方法有</p>
+<p><img src="/.com//image-20200329145637397.png" alt="image-20200329145637397"></p>
+<p>baseBuilder的实现类类型，XmlConfigBuilder是解析整个config的配置项的，XmlMapper是解析namespace模块的，XmlStatement是解析单个sql模块的……</p>
+<p><img src="/.com//image-20200329150020147.png" alt="image-20200329150020147"></p>
+<h3 id="3-2-SqlNode-amp-SqlSource"><a href="#3-2-SqlNode-amp-SqlSource" class="headerlink" title="3.2 SqlNode&amp;SqlSource"></a>3.2 SqlNode&amp;SqlSource</h3><h3 id="3-3-ResultSetHandler"><a href="#3-3-ResultSetHandler" class="headerlink" title="3.3 ResultSetHandler"></a>3.3 ResultSetHandler</h3><h3 id="3-4-KeyGernrator"><a href="#3-4-KeyGernrator" class="headerlink" title="3.4 KeyGernrator"></a>3.4 KeyGernrator</h3><h3 id="3-5-StatementHandler"><a href="#3-5-StatementHandler" class="headerlink" title="3.5 StatementHandler"></a>3.5 StatementHandler</h3><h3 id="3-6-Executor"><a href="#3-6-Executor" class="headerlink" title="3.6 Executor"></a>3.6 Executor</h3><p><img src="/.com//image-20200329153140246.png" alt="image-20200329153140246"></p>
+<h4 id="3-6-1模板方法模式"><a href="#3-6-1模板方法模式" class="headerlink" title="3.6.1模板方法模式"></a>3.6.1模板方法模式</h4><h4 id="3-6-2-BaseExecutor"><a href="#3-6-2-BaseExecutor" class="headerlink" title="3.6.2 BaseExecutor"></a>3.6.2 BaseExecutor</h4><p>BaseExecutor的基本方法</p>
+<p><img src="/.com//image-20200329153451254.png" alt="image-20200329153451254"></p>
+<p>#####3.6.2.1 一级缓存</p>
+<p>一级缓存是会话级别的缓存，在mybatis中每创建一个sqlSession对象，就表示开启一次数据库会话。在一次会话中，应用程序可能在短时间内，例如一次事务中，反复查询相同语句。</p>
+<p>一级缓存的生命周期与SqlSession相同，其实也就是与SqlSession封装的Executor对象的声明周期相同，当调用close()时，该Executor中的一级缓存就不可用了。但是一级缓存的存活时间是会有很多因素影响的，如果调用了Executor.update()（这个方法负责执行insert，update，delete三类Sql语句）时，会先清空缓存内容。</p>
+<h5 id="3-6-2-1-一级缓存的管理"><a href="#3-6-2-1-一级缓存的管理" class="headerlink" title="3.6.2.1 一级缓存的管理"></a>3.6.2.1 一级缓存的管理</h5><p>如执行query方法</p>
+<p><img src="/.com//image-20200329154148650.png" alt="image-20200329154148650"></p>
+<p>CacheKey由MappedStatement的id，对应的offset和limit、sql语句（包含？占位符）、用户传递的实参，以及Environment 的id这五部分组成。</p>
+<h4 id="3-6-3-SimpleExecutor"><a href="#3-6-3-SimpleExecutor" class="headerlink" title="3.6.3 SimpleExecutor"></a>3.6.3 SimpleExecutor</h4><p>继承了BaseExecutor，简单版</p>
+<h4 id="3-6-4-ReuseExecutor"><a href="#3-6-4-ReuseExecutor" class="headerlink" title="3.6.4 ReuseExecutor"></a>3.6.4 ReuseExecutor</h4><p>重用statement对象</p>
+<h4 id="3-6-5-BatchExecutor"><a href="#3-6-5-BatchExecutor" class="headerlink" title="3.6.5 BatchExecutor"></a>3.6.5 BatchExecutor</h4><p>批量发送很多条sql到数据库</p>
+<p>####3.6.6 CachingExecutor</p>
+<p>CachingExecutor是一个Executor接口的装饰器，他为Executor增加了二级缓存相关功能。</p>
+<h5 id="3-6-6-1-二级缓存"><a href="#3-6-6-1-二级缓存" class="headerlink" title="3.6.6.1 二级缓存"></a>3.6.6.1 二级缓存</h5><p>Mybaits的二级缓存是应用级别的，他的生命周期与应用程序的声明周期相同</p>
+<p><img src="/.com//image-20200329155250221.png" alt="image-20200329155250221"></p>
+<p><img src="/.com//image-20200329155301002.png" alt="image-20200329155301002"></p>
+<h2 id="四、高级主题"><a href="#四、高级主题" class="headerlink" title="四、高级主题"></a>四、高级主题</h2><h3 id="4-1-插件模块"><a href="#4-1-插件模块" class="headerlink" title="4.1 插件模块"></a>4.1 插件模块</h3><p>mybatis虽然叫插件化，但是是通过Interceptor实现的，mybaits中的插件模块中，涉及责任链模式和JDK动态代理。Mybatis允许拦截器拦截Excutors的方法、ParameterHandler方法、ResultSetHandler的方法以及StatementHandler的方法。</p>
+<p>父类是Interceptor</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Interceptor</span> </span>&#123;</span><br><span class="line">    <span class="comment">//执行拦截逻辑的方法</span></span><br><span class="line">    <span class="function">Object <span class="title">intercept</span><span class="params">(Invocation var1)</span> <span class="keyword">throws</span> Throwable</span>;</span><br><span class="line">	<span class="comment">//决定是否触发Interceptor方法</span></span><br><span class="line">    <span class="function">Object <span class="title">plugin</span><span class="params">(Object var1)</span></span>;</span><br><span class="line">    <span class="comment">//根据配置初始化Interceptor对象</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setProperties</span><span class="params">(Properties var1)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用户自定义的拦截器除了继承Inerceptor接口，还需要使用@Interceptor和@Signature注解进行标识，@Interceptor注解中指定了一个@Signature注解列表，每个@Signature注解中都标识了该插件需要拦截的方法信息。</p>
+<p><img src="/.com//image-20200329151913416.png" alt="image-20200329151913416"></p>
+<p>定义完一个自定义的拦截器之后，需要在mybatis-config.xml配置文件中对该拦截器进行配置。</p>
+<p><img src="/.com//image-20200329152048242.png" alt="image-20200329152048242"></p>
+<p>插件如何生效？</p>
+<p><img src="/.com//image-20200329152254258.png" alt="image-20200329152254258"></p>
+<p>遍历interceptors集合，并调用每个元素的plugin（）创建代理对象。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/29/mybatis%E8%AF%A6%E8%A7%A3/" data-id="ck8cs5a0t0000o8adc90ug2cf" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/03/19/Spring%E7%9A%84IoC%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Spring的IoC源码解析</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/03/29/mybatis%E8%AF%A6%E8%A7%A3/">mybatis详解</a>
+          </li>
+        
+          <li>
+            <a href="/2020/03/19/Spring%E7%9A%84IoC%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">Spring的IoC源码解析</a>
+          </li>
+        
+          <li>
+            <a href="/2020/02/28/spring/">spring</a>
+          </li>
+        
+          <li>
+            <a href="/2020/01/30/java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9B%B8%E5%85%B3/">java虚拟机相关</a>
+          </li>
+        
+          <li>
+            <a href="/2020/01/17/%E4%BC%98%E7%A7%80%E7%BD%91%E5%9D%80%E6%B1%87%E6%80%BB/">优秀网址汇总</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

@@ -14,10 +14,15 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="spring的Ioc概述一、ioc容器和依赖反转模式通过ioc容器，对象依赖关系的管理被反转了，转到ioc容器中来了，对象之间的依赖关系由ioc容器进行管理。这里的反转，指的是责任的反转。 二、ioc容器系列作为一个ioc容器，也需要为它的具体实现指定基本的功能规范，这个功能规范的设计表现为BeanFactory，它是spring为用户提供的ioc容器所设定的最基本的功能规范。 BeanDefin">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/.com//diagram.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200321114315588.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200321114428783.png">
+<meta property="og:image" content="http://yoursite.com/.com//image-20200321144804722.png">
 <meta property="article:published_time" content="2020-03-19T07:23:05.000Z">
-<meta property="article:modified_time" content="2020-03-19T07:23:43.331Z">
+<meta property="article:modified_time" content="2020-03-22T05:16:01.677Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/.com//diagram.png">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -120,6 +125,7 @@
 <li>我们看到它扩展了MessageSource接口，这些信息源的扩展功能可以支持国际化的实现，为开发多语言版本的应用提供服务。</li>
 <li>访问资源。体现在ResourceLoader和Resource的支持上，这样我们可以从不同的地方得到Bean定义资源。</li>
 <li>支持应用事件。继承了接口ApplicationEventPublisher,这样在上下文中引入了事件机制，这些事件和Bean的生命周期的结合为Bean的管理提供了便利。</li>
+<li>​</li>
 <li>ApplicationContext具备了丰富的附加功能，使得ApplicationContext与简单的BeanFactory相比，对它的使用是一种面向框架的使用风格，开发时一般使用建议使用ApplicationContext。</li>
 </ul>
 <h3 id="2-4-Ioc容器初始化"><a href="#2-4-Ioc容器初始化" class="headerlink" title="2.4 Ioc容器初始化"></a>2.4 Ioc容器初始化</h3><p>初始化过程包括：BeanDefinition的Resource定位、载入、注册这三个基本过程。</p>
@@ -127,7 +133,19 @@
 <p>②：载入：BeanDefinition的载入，该载入过程把用户定义好的Bean表示成IoC容器的内部数据结构，而这个容器的内部的数据结构就是BeanDefinition。</p>
 <p>③：注册：向IoC容器注册这些BeanDefinition的过程，这个过程是通过调用BeanDefinitionRegistry接口的实现来完成的。Ioc内部是使用一个HashMap来维持这些BeanDefinition数据的。</p>
 <p>注意：Ioc容器和上下文初始化一般不包括Bean的依赖注入的实现。一般而言，依赖注入发生在应用第一次向容器通过getBean索取Bean时。但是有例外：ioc容器有一个预实例化的配置，可以通过在Bean定义信息中的lazyInit属性来设定，有了这个预实例化的配置，使得这个Bean的依赖注入在Ioc容器初始化时就预先完成了。</p>
-<h4 id="2-4-1-BeanDefinition的Resource定位"><a href="#2-4-1-BeanDefinition的Resource定位" class="headerlink" title="2.4.1 BeanDefinition的Resource定位"></a>2.4.1 BeanDefinition的Resource定位</h4><p>画出spring定位时的代码流程图</p>
+<h4 id="2-4-1-BeanDefinition的Resource定位"><a href="#2-4-1-BeanDefinition的Resource定位" class="headerlink" title="2.4.1 BeanDefinition的Resource定位"></a>2.4.1 BeanDefinition的Resource定位</h4><p><img src="/.com//diagram.png" alt="image-20200319163730289"></p>
+<p>画出spring定位时的代码流程图</p>
+<h4 id="2-4-1-BeanDefinition在IoC中的注册"><a href="#2-4-1-BeanDefinition在IoC中的注册" class="headerlink" title="2.4.1 BeanDefinition在IoC中的注册"></a>2.4.1 BeanDefinition在IoC中的注册</h4><p>注册的过程是发生在DefaultListableBeanFactory中的registerBeanDefinition方法中。填充到concurrentHashMap的definitionMap中</p>
+<h4 id="2-4-2-IoC容器的依赖注入"><a href="#2-4-2-IoC容器的依赖注入" class="headerlink" title="2.4.2 IoC容器的依赖注入"></a>2.4.2 IoC容器的依赖注入</h4><p>首先依赖注入是发生在用户第一次向Ioc索要bean时触发的，但是也有例外，如lazy_init属性可以完成对Bean的预实例化具体流程见流程图</p>
+<h3 id="2-5容器的其他相关特性的实现"><a href="#2-5容器的其他相关特性的实现" class="headerlink" title="2.5容器的其他相关特性的实现"></a>2.5容器的其他相关特性的实现</h3><h4 id="2-5-1lazy-init属性和预实例化"><a href="#2-5-1lazy-init属性和预实例化" class="headerlink" title="2.5.1lazy_init属性和预实例化"></a>2.5.1lazy_init属性和预实例化</h4><p>预实例化时发生在AbstractApplicationContext中的refresh方法中实现的</p>
+<p><img src="/.com//image-20200321114315588.png" alt="image-20200321114315588"></p>
+<p>最后实在DefaultListableBeanFactory中的preInstantiateSingletons中实现的</p>
+<p><img src="/.com//image-20200321114428783.png" alt="image-20200321114428783"></p>
+<h4 id="2-5-2FactoryBean的实现"><a href="#2-5-2FactoryBean的实现" class="headerlink" title="2.5.2FactoryBean的实现"></a>2.5.2FactoryBean的实现</h4><p>FactoryBean是一个能生产或修饰对象生成的工厂Bean。一个Bean如果实现了FactoryBean接口，那么根据该Bean的名称获取到的实际上是getObject()返回的对象，而不是这个Bean自身实例，如果要获取这个Bean自身实例，那么需要在名称前面加上’&amp;’符号。</p>
+<p><a href="https://www.cnblogs.com/guitu18/p/11284894.html" target="_blank" rel="noopener">https://www.cnblogs.com/guitu18/p/11284894.html</a></p>
+<h4 id="2-5-3BeanPostProcessor的实现"><a href="#2-5-3BeanPostProcessor的实现" class="headerlink" title="2.5.3BeanPostProcessor的实现"></a>2.5.3BeanPostProcessor的实现</h4><h2 id="5-spring对jdbc的支持"><a href="#5-spring对jdbc的支持" class="headerlink" title="5.spring对jdbc的支持"></a>5.spring对jdbc的支持</h2><h3 id="5-1jdbcTemplate"><a href="#5-1jdbcTemplate" class="headerlink" title="5.1jdbcTemplate"></a>5.1jdbcTemplate</h3><p>spring主要通过jdbcTemplate来操作数据库</p>
+<p><img src="/.com//image-20200321144804722.png" alt="image-20200321144804722"></p>
+<p>spring与ibatis的结合，使用的是FactoryBean来完成对iBatis的配置，结合了Template来封装相应的操作</p>
 
       
     </div>
@@ -140,6 +158,15 @@
   
     
 <nav id="article-nav">
+  
+    <a href="/2020/03/29/mybatis%E8%AF%A6%E8%A7%A3/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          mybatis详解
+        
+      </div>
+    </a>
   
   
     <a href="/2020/02/28/spring/" id="article-nav-older" class="article-nav-link-wrap">
@@ -181,6 +208,10 @@
       <ul>
         
           <li>
+            <a href="/2020/03/29/mybatis%E8%AF%A6%E8%A7%A3/">mybatis详解</a>
+          </li>
+        
+          <li>
             <a href="/2020/03/19/Spring%E7%9A%84IoC%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">Spring的IoC源码解析</a>
           </li>
         
@@ -194,10 +225,6 @@
         
           <li>
             <a href="/2020/01/17/%E4%BC%98%E7%A7%80%E7%BD%91%E5%9D%80%E6%B1%87%E6%80%BB/">优秀网址汇总</a>
-          </li>
-        
-          <li>
-            <a href="/2020/01/09/idea%E5%BF%AB%E6%8D%B7%E4%BD%BF%E7%94%A8/">idea快捷使用</a>
           </li>
         
       </ul>
